@@ -1,9 +1,9 @@
-from datetime import datetime
 import yt_dlp
-import tempfile
 import os
+from datetime import datetime
 from config import COOKIE_FILE
 import re
+import tempfile
 
 def sanitize_filename(name):
     return re.sub(r'[\\/*?:"<>|]', "", name)
@@ -17,19 +17,19 @@ def download_video(query):
     if COOKIE_FILE:
         ydl_opts["cookiefile"] = COOKIE_FILE
 
-    # Use temporary directory
-    with tempfile.TemporaryDirectory() as tmpdir:
-        ydl_opts["outtmpl"] = os.path.join(tmpdir, "%(title)s.%(ext)s")
+    tmpfile = tempfile.NamedTemporaryFile(delete=False, suffix=".mp4")
+    filepath = tmpfile.name
+    tmpfile.close()
+
+    ydl_opts["outtmpl"] = filepath
+
+    try:
         with yt_dlp.YoutubeDL(ydl_opts) as ydl:
             info = ydl.extract_info(f"ytsearch:{query}", download=True)["entries"][0]
 
-        filename = sanitize_filename(info["title"]) + "." + info["ext"]
-        filepath = os.path.join(tmpdir, filename)
-        if not os.path.exists(filepath):
-            raise FileNotFoundError(f"File not found: {filepath}")
-
         upload_date = info.get("upload_date")
         upload_date_str = f"{upload_date[:4]}-{upload_date[4:6]}-{upload_date[6:]}" if upload_date else "N/A"
+
         data = {
             "title": info.get("title"),
             "channel": info.get("uploader") or "Unknown",
@@ -48,6 +48,12 @@ def download_video(query):
             "file_size": info.get("filesize_approx") or 0,
             "license": info.get("license", "N/A"),
             "age_restricted": "Yes" if info.get("age_limit", 0) > 0 else "No",
-            "filepath": filepath,
+            "filepath": filepath
         }
+
         return filepath, data
+
+    except Exception as e:
+        if os.path.exists(filepath):
+            os.remove(filepath)
+        raise e
