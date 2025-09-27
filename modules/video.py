@@ -9,25 +9,24 @@ def sanitize_filename(name):
     return re.sub(r'[\\/*?:"<>|]', "", name)
 
 def download_video(query):
+    tmpfile = tempfile.NamedTemporaryFile(delete=False, suffix=".mp4")
+    filepath = tmpfile.name
+    tmpfile.close()
+
     ydl_opts = {
         "format": "bestvideo+bestaudio/best",
         "noplaylist": True,
+        "ffmpeg_location": "/app/.heroku/bin",
+        "outtmpl": filepath
     }
 
     if COOKIE_FILE:
         ydl_opts["cookiefile"] = COOKIE_FILE
 
-    tmpfile = tempfile.NamedTemporaryFile(delete=False, suffix=".mp4")
-    filepath = tmpfile.name
-    tmpfile.close()
-
-    ydl_opts["outtmpl"] = filepath
-
     try:
         with yt_dlp.YoutubeDL(ydl_opts) as ydl:
             search_result = ydl.extract_info(f"ytsearch:{query}", download=True)
 
-            # Check if any result is found
             if "entries" not in search_result or len(search_result["entries"]) == 0:
                 raise ValueError(f"No results found for: {query}")
 
