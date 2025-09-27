@@ -20,7 +20,6 @@ def download_song(query):
     if COOKIE_FILE:
         ydl_opts["cookiefile"] = COOKIE_FILE
 
-    # Temporary file that stays until manually deleted
     tmpfile = tempfile.NamedTemporaryFile(delete=False, suffix=".mp3")
     filepath = tmpfile.name
     tmpfile.close()
@@ -29,9 +28,14 @@ def download_song(query):
 
     try:
         with yt_dlp.YoutubeDL(ydl_opts) as ydl:
-            info = ydl.extract_info(f"ytsearch:{query}", download=True)["entries"][0]
+            search_result = ydl.extract_info(f"ytsearch:{query}", download=True)
 
-        # Prepare metadata
+            # Check if any result is found
+            if "entries" not in search_result or len(search_result["entries"]) == 0:
+                raise ValueError(f"No results found for: {query}")
+
+            info = search_result["entries"][0]
+
         upload_date = info.get("upload_date")
         upload_date_str = f"{upload_date[:4]}-{upload_date[4:6]}-{upload_date[6:]}" if upload_date else "N/A"
 
