@@ -1,5 +1,6 @@
 from datetime import datetime
 import yt_dlp
+from config import COOKIE_FILE
 
 def download_video(query):
     ydl_opts = {
@@ -7,6 +8,10 @@ def download_video(query):
         "outtmpl": "%(title)s.%(ext)s",
         "noplaylist": True,
     }
+
+    # Use cookies if available
+    if COOKIE_FILE:
+        ydl_opts["cookiefile"] = COOKIE_FILE
 
     with yt_dlp.YoutubeDL(ydl_opts) as ydl:
         info = ydl.extract_info(f"ytsearch:{query}", download=True)["entries"][0]
