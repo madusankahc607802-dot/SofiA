@@ -25,7 +25,13 @@ def download_video(query):
 
     try:
         with yt_dlp.YoutubeDL(ydl_opts) as ydl:
-            info = ydl.extract_info(f"ytsearch:{query}", download=True)["entries"][0]
+            search_result = ydl.extract_info(f"ytsearch:{query}", download=True)
+
+            # Check if any result is found
+            if "entries" not in search_result or len(search_result["entries"]) == 0:
+                raise ValueError(f"No results found for: {query}")
+
+            info = search_result["entries"][0]
 
         upload_date = info.get("upload_date")
         upload_date_str = f"{upload_date[:4]}-{upload_date[4:6]}-{upload_date[6:]}" if upload_date else "N/A"
