@@ -16,7 +16,7 @@ def download_video(query):
     ydl_opts = {
         "format": "bestvideo+bestaudio/best",
         "noplaylist": True,
-        "ffmpeg_location": "/app/.heroku/bin",
+        "ffmpeg_location": "/app/vendor/ffmpeg/bin",  # ✅ Correct Heroku ffmpeg path
         "outtmpl": filepath
     }
 
