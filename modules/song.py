@@ -17,7 +17,7 @@ def download_song(query):
     ydl_opts = {
         "format": "bestaudio/best",
         "noplaylist": True,
-        "ffmpeg_location": "/app/.heroku/bin",  # Heroku FFmpeg
+        "ffmpeg_location": "/app/vendor/ffmpeg/bin",  # ✅ Correct Heroku ffmpeg path
         "postprocessors": [
             {
                 "key": "FFmpegExtractAudio",
