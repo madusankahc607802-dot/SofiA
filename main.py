@@ -1,4 +1,5 @@
 import os
+os.environ["PATH"] += os.pathsep + "/app/vendor/ffmpeg/bin"
 from telegram import InlineKeyboardButton, InlineKeyboardMarkup, Update
 from telegram.ext import ApplicationBuilder, CommandHandler, ContextTypes
 from config import BOT_TOKEN, DEVELOPER, SUPPORT_GROUP
