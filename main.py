@@ -1,5 +1,7 @@
 import os
+# Add ffmpeg path
 os.environ["PATH"] += os.pathsep + "/app/vendor/ffmpeg/bin"
+
 from telegram import InlineKeyboardButton, InlineKeyboardMarkup, Update
 from telegram.ext import ApplicationBuilder, CommandHandler, ContextTypes
 from config import BOT_TOKEN, DEVELOPER, SUPPORT_GROUP
@@ -39,7 +41,7 @@ async def song_command(update: Update, context: ContextTypes.DEFAULT_TYPE):
     finally:
         await downloading_msg.delete()
         if 'filepath' in locals() and os.path.exists(filepath):
-            os.remove(filepath)  # Cleanup temp file
+            os.remove(filepath)
 
 # /video command
 async def video_command(update: Update, context: ContextTypes.DEFAULT_TYPE):
@@ -70,7 +72,7 @@ async def video_command(update: Update, context: ContextTypes.DEFAULT_TYPE):
     finally:
         await downloading_msg.delete()
         if 'filepath' in locals() and os.path.exists(filepath):
-            os.remove(filepath)  # Cleanup temp file
+            os.remove(filepath)
 
 # Main entry
 if __name__ == "__main__":
